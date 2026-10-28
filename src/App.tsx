@@ -3,6 +3,7 @@ import LandingPage from './pages/LandingPage';
 import SchoolsPage from './pages/SchoolsPage';
 import SchoolDetailPage from './pages/SchoolDetailPage';
 import SchoolOnboarding from './pages/SchoolOnboarding';
+import SchoolAuth from './pages/SchoolAuth';
 import SchoolDashboard from './pages/SchoolDashboard';
 import ParentAuth from './pages/ParentAuth';
 import ParentDashboard from './pages/ParentDashboard';
@@ -20,6 +21,7 @@ function App() {
         
         {/* School routes */}
         <Route path="/school/onboarding" element={<SchoolOnboarding />} />
+        <Route path="/school/auth" element={<SchoolAuth />} />
         <Route path="/school/dashboard" element={<SchoolDashboard />} />
         
         {/* Parent routes */}

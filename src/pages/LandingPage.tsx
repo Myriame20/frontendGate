@@ -100,10 +100,14 @@ export default function LandingPage() {
               <a href="#features" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Fonctionnalités</a>
               <a href="#pricing" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Tarifs</a>
               <Link to="/schools" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Explorer les écoles</Link>
+              <Link to="/school/auth" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Connexion école</Link>
             </div>
             <div className="flex items-center gap-3">
               <Link to="/parent/dashboard" className="hidden sm:block text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors">
                 Espace Parent
+              </Link>
+              <Link to="/school/auth" className="hidden sm:block text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors">
+                Connexion école
               </Link>
               <Link 
                 to="/school/onboarding" 

@@ -27,6 +27,11 @@ export default function SchoolDashboard() {
     }
   }, [user]);
 
+  // Vérifier si l'école est validée
+  const isSchoolVerified = school?.verificationStatus === 'verified';
+  const isSchoolPending = school?.verificationStatus === 'pending';
+  const isSchoolRejected = school?.verificationStatus === 'rejected';
+
   const handleUpdateStatus = (appId: string, status: 'approved' | 'rejected' | 'review') => {
     const apps = getApplications();
     const idx = apps.findIndex(a => a.id === appId);
@@ -52,6 +57,177 @@ export default function SchoolDashboard() {
 
   if (!school) {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
+  }
+
+  // Écran d'attente si l'école n'est pas encore validée
+  if (isSchoolPending) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-6">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            <div className="text-center">
+              {/* Icône animée */}
+              <div className="relative inline-block mb-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center animate-pulse">
+                  <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full animate-ping"></div>
+              </div>
+
+              <h1 className="text-3xl font-bold text-neutral-900 mb-4">
+                Votre école est en cours de validation
+              </h1>
+              
+              <p className="text-lg text-neutral-600 mb-8">
+                Merci d'avoir créé votre page <strong>{school.name}</strong> ! 
+                Notre équipe est en train de vérifier les informations fournies.
+              </p>
+
+              {/* Statut de validation */}
+              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 mb-8">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <svg className="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-semibold text-yellow-900 mb-2">Statut actuel</h3>
+                    <ul className="space-y-2 text-sm text-yellow-800">
+                      <li className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        Inscription reçue ✓
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+                        Vérification en cours...
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-neutral-300 rounded-full"></span>
+                        Publication de la page
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Délai estimé */}
+              <div className="bg-neutral-50 rounded-xl p-6 mb-8">
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <svg className="w-6 h-6 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-lg font-semibold text-neutral-900">Délai estimé</span>
+                </div>
+                <p className="text-neutral-600">
+                  La validation prend généralement <strong>24 à 48 heures</strong>. 
+                  Vous recevrez une notification dès que votre page sera activée.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="space-y-4">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Actualiser le statut
+                </button>
+                
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('edugate_current_user');
+                    navigate('/');
+                  }}
+                  className="w-full bg-neutral-100 text-neutral-700 py-3 px-6 rounded-xl font-semibold hover:bg-neutral-200 transition-all"
+                >
+                  Retour à l'accueil
+                </button>
+              </div>
+
+              {/* Contact support */}
+              <div className="mt-8 pt-6 border-t border-neutral-200">
+                <p className="text-sm text-neutral-500">
+                  Besoin d'aide ? Contactez-nous à{' '}
+                  <a href="mailto:support@edugate.com" className="text-emerald-600 font-semibold hover:underline">
+                    support@edugate.com
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Écran de rejet
+  if (isSchoolRejected) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-6">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            <div className="text-center">
+              <div className="w-24 h-24 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+
+              <h1 className="text-3xl font-bold text-neutral-900 mb-4">
+                Inscription non validée
+              </h1>
+              
+              <p className="text-lg text-neutral-600 mb-8">
+                Malheureusement, nous n'avons pas pu valider l'inscription de <strong>{school.name}</strong>.
+              </p>
+
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-8 text-left">
+                <h3 className="font-semibold text-red-900 mb-3">Raisons possibles :</h3>
+                <ul className="space-y-2 text-sm text-red-800">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-500 mt-1">•</span>
+                    <span>Informations incomplètes ou incorrectes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-500 mt-1">•</span>
+                    <span>Impossible de vérifier l'existence de l'établissement</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-500 mt-1">•</span>
+                    <span>Doublon avec une école déjà inscrite</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="space-y-4">
+                <Link
+                  to="/school/onboarding"
+                  className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Soumettre une nouvelle inscription
+                </Link>
+                
+                <a
+                  href="mailto:support@edugate.com"
+                  className="w-full block bg-neutral-100 text-neutral-700 py-3 px-6 rounded-xl font-semibold hover:bg-neutral-200 transition-all text-center"
+                >
+                  Contacter le support
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const stats = [

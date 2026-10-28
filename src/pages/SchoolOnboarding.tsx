@@ -83,21 +83,33 @@ export default function SchoolOnboarding() {
     return (
       <div className="min-h-screen flex items-center justify-center px-6">
         <div className="max-w-md text-center">
-          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Clock className="w-8 h-8 text-yellow-600" />
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-neutral-900 mb-4">Demande envoyée !</h2>
+          <h2 className="text-2xl font-bold text-neutral-900 mb-4">Inscription réussie !</h2>
           <p className="text-neutral-600 mb-6">
-            Votre école a été soumise pour vérification. Notre équipe va vérifier l'existence de votre établissement et vous recevrez une notification dès que votre page sera activée.
+            Votre école a été soumise pour vérification. Vous pouvez maintenant vous connecter pour suivre le statut de validation.
           </p>
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mb-6">
-            <p className="text-sm text-yellow-800">
-              <strong>Prochaine étape :</strong> Vous recevrez un email de confirmation avec vos identifiants de connexion une fois votre école vérifiée.
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+            <p className="text-sm text-blue-800 mb-2">
+              <strong>Vos identifiants :</strong>
+            </p>
+            <p className="text-xs text-blue-700 font-mono bg-white p-2 rounded">
+              Email: {adminEmail}<br />
+              Mot de passe: {adminPassword}
+            </p>
+            <p className="text-xs text-blue-700 mt-2">
+              ⚠️ Conservez ces informations précieusement
             </p>
           </div>
-          <Link to="/" className="btn-primary">
-            Retour à l'accueil
-          </Link>
+          <div className="space-y-3">
+            <Link to="/school/auth" className="btn-primary w-full block">
+              Se connecter maintenant
+            </Link>
+            <Link to="/" className="btn-secondary w-full block">
+              Retour à l'accueil
+            </Link>
+          </div>
         </div>
       </div>
     );
