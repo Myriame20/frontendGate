@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, MessageSquare, Calendar, Clock, CheckCircle, XCircle, AlertCircle, Send, Plus, Trash2 } from 'lucide-react';
-import { getParents, getApplications, getMessages, getAppointments, saveMessages, saveAppointments, schools, generateId, type Application, type Message, type Appointment } from '../data/store';
+import { getParents, getApplications, getMessages, getAppointments, saveMessages, saveAppointments, getSchools, generateId, type Application, type Message, type Appointment } from '../data/store';
 
 interface Props {
   parentId: string;
@@ -31,7 +31,8 @@ export default function ParentDashboard({ parentId }: Props) {
     rejected: { icon: XCircle, label: 'Rejetée', class: 'status-rejected' },
   };
 
-  const getSchoolName = (schoolId: string) => schools.find(s => s.id === schoolId)?.name || 'École inconnue';
+  const allSchools = getSchools();
+  const getSchoolName = (schoolId: string) => allSchools.find(s => s.id === schoolId)?.name || 'École inconnue';
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedSchool) return;
@@ -181,7 +182,7 @@ export default function ParentDashboard({ parentId }: Props) {
                         className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-forest-400"
                       >
                         <option value="">Sélectionner une école</option>
-                        {schools.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        {allSchools.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                       </select>
                     </div>
                     <div>
@@ -262,7 +263,7 @@ export default function ParentDashboard({ parentId }: Props) {
                         className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-forest-400"
                       >
                         <option value="">Sélectionner...</option>
-                        {schools.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        {allSchools.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                       </select>
                     </div>
                     <div className="grid grid-cols-2 gap-3">

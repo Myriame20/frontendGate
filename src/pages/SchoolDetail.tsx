@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Globe, Star, Users, BookOpen, Calendar, CheckCircle, ArrowLeft, Upload, Send } from 'lucide-react';
-import { schools, getApplications, saveApplications, generateId } from '../data/store';
+import { MapPin, Phone, Mail, Globe, Star, Users, BookOpen, CheckCircle, ArrowLeft, Upload, Send, Play, Video, Image as ImageIcon, Clock, Award } from 'lucide-react';
+import { getSchools, getApplications, saveApplications, generateId } from '../data/store';
+import VideoPlayer from '../components/VideoPlayer';
 
 interface Props {
   user: { type: 'parent' | 'school'; id: string } | null;
@@ -10,9 +11,9 @@ interface Props {
 
 export default function SchoolDetail({ user }: Props) {
   const { id } = useParams();
+  const schools = getSchools();
   const school = schools.find(s => s.id === id);
-  const [activeTab, setActiveTab] = useState<'overview' | 'programs' | 'gallery' | 'apply'>('overview');
-  const [showApplyForm, setShowApplyForm] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'programs' | 'gallery' | 'videos' | 'apply'>('overview');
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     childName: '',
@@ -20,6 +21,7 @@ export default function SchoolDetail({ user }: Props) {
     grade: '',
     notes: ''
   });
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   if (!school) {
     return (
@@ -54,10 +56,16 @@ export default function SchoolDetail({ user }: Props) {
     setApplicationSubmitted(true);
   };
 
+  const allMedia = [
+    ...school.gallery.map(url => ({ type: 'image' as const, url })),
+    ...school.uploadedMedia.map(m => ({ type: m.type, url: m.url }))
+  ];
+
   const tabs = [
     { id: 'overview', label: 'Aperçu' },
-    { id: 'programs', label: 'Programmes' },
-    { id: 'gallery', label: 'Galerie' },
+    { id: 'programs', label: 'Programmes & Tarifs' },
+    { id: 'gallery', label: `Galerie (${allMedia.length})` },
+    ...(school.videos.length > 0 ? [{ id: 'videos', label: `Vidéos (${school.videos.length})` }] : []),
     { id: 'apply', label: 'Inscription' },
   ];
 
@@ -76,10 +84,19 @@ export default function SchoolDetail({ user }: Props) {
               <span className="text-5xl">{school.logo}</span>
               <div>
                 <h1 className="text-3xl sm:text-4xl font-bold text-white font-serif">{school.name}</h1>
-                <div className="flex flex-wrap items-center gap-4 mt-2 text-white/80 text-sm">
-                  <span className="flex items-center gap-1"><MapPin className="w-4 h-4" />{school.city}, {school.province}</span>
-                  <span className="flex items-center gap-1"><Star className="w-4 h-4 text-gold-400 fill-gold-400" />{school.rating}/5</span>
-                  <span className="px-2 py-0.5 bg-white/20 rounded-full">{school.type}</span>
+                <div className="flex flex-wrap items-center gap-3 mt-2">
+                  <span className="flex items-center gap-1 text-white/80 text-sm">
+                    <MapPin className="w-4 h-4" />{school.city}, {school.province}
+                  </span>
+                  <span className="flex items-center gap-1 text-white/80 text-sm">
+                    <Star className="w-4 h-4 text-gold-400 fill-gold-400" />{school.rating}/5
+                  </span>
+                  <span className="px-2 py-0.5 bg-white/20 rounded-full text-white text-sm">{school.type}</span>
+                  <span className={`px-3 py-0.5 rounded-full text-sm font-medium ${
+                    school.enrollmentOpen ? 'enrollment-open' : 'enrollment-closed'
+                  }`}>
+                    {school.enrollmentOpen ? '🟢 Inscriptions ouvertes' : '🔴 Inscriptions fermées'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -133,15 +150,54 @@ export default function SchoolDetail({ user }: Props) {
                   </div>
                 </div>
 
+                {/* Featured Video */}
+                {school.videos.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-semibold text-forest-800 mb-4 flex items-center gap-2">
+                      <Video className="w-5 h-5" /> Vidéo de présentation
+                    </h3>
+                    <VideoPlayer
+                      src={school.videos[0].url}
+                      poster={school.videos[0].thumbnail}
+                      title={school.videos[0].title}
+                      autoplay={false}
+                      muted={true}
+                      loop={false}
+                      className="aspect-video"
+                    />
+                  </div>
+                )}
+
                 <h3 className="text-xl font-semibold text-forest-800 mb-4">Installations & Services</h3>
-                <div className="grid sm:grid-cols-2 gap-3">
+                <div className="grid sm:grid-cols-2 gap-3 mb-8">
                   {school.features.map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-gray-700">
+                    <div key={i} className="flex items-center gap-2 text-gray-700 bg-forest-50/50 rounded-lg p-3">
                       <CheckCircle className="w-5 h-5 text-forest-500 flex-shrink-0" />
                       <span>{f}</span>
                     </div>
                   ))}
                 </div>
+
+                {/* Admission Requirements */}
+                {school.admissionRequirements.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold text-forest-800 mb-4 flex items-center gap-2">
+                      <Award className="w-5 h-5" /> Conditions d'admission
+                    </h3>
+                    <div className="bg-ivory-100 rounded-xl border border-forest-100 p-6">
+                      <ul className="space-y-3">
+                        {school.admissionRequirements.map((req, i) => (
+                          <li key={i} className="flex items-start gap-3 text-gray-700">
+                            <span className="w-6 h-6 bg-forest-100 rounded-full flex items-center justify-center text-forest-700 text-xs font-bold flex-shrink-0 mt-0.5">
+                              {i + 1}
+                            </span>
+                            <span>{req}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -186,19 +242,67 @@ export default function SchoolDetail({ user }: Props) {
             {activeTab === 'gallery' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <h2 className="text-2xl font-bold text-forest-800 mb-6">Galerie Photos</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {school.gallery.map((img, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: i * 0.1 }}
-                      className="aspect-square rounded-xl overflow-hidden"
-                    >
-                      <img src={img} alt={`${school.name} ${i + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
-                    </motion.div>
-                  ))}
-                </div>
+                {allMedia.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <ImageIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>Aucune photo disponible</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {allMedia.map((media, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="aspect-square rounded-xl overflow-hidden cursor-pointer group"
+                        onClick={() => setSelectedImage(media.url)}
+                      >
+                        <img src={media.url} alt={`${school.name} ${i + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Lightbox */}
+                {selectedImage && (
+                  <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
+                    <img src={selectedImage} alt="Photo agrandie" className="max-w-full max-h-full rounded-lg" />
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {activeTab === 'videos' && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <h2 className="text-2xl font-bold text-forest-800 mb-6">Vidéos</h2>
+                {school.videos.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <Video className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>Aucune vidéo disponible</p>
+                  </div>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    {school.videos.map((video, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                      >
+                        <VideoPlayer
+                          src={video.url}
+                          poster={video.thumbnail}
+                          title={video.title}
+                          autoplay={false}
+                          muted={true}
+                          loop={false}
+                          className="aspect-video"
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -206,6 +310,18 @@ export default function SchoolDetail({ user }: Props) {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <h2 className="text-2xl font-bold text-forest-800 mb-6">Demande d'inscription</h2>
                 
+                {!school.enrollmentOpen && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-6 h-6 text-red-600" />
+                      <div>
+                        <h3 className="font-semibold text-red-800">Inscriptions fermées</h3>
+                        <p className="text-sm text-red-600">Les inscriptions sont actuellement fermées pour cet établissement. Veuillez contacter l'école pour plus d'informations.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {applicationSubmitted ? (
                   <div className="bg-forest-50 rounded-xl p-8 text-center">
                     <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -231,6 +347,10 @@ export default function SchoolDetail({ user }: Props) {
                 ) : user.type !== 'parent' ? (
                   <div className="bg-ivory-100 rounded-xl p-8 text-center border border-forest-100">
                     <p className="text-gray-600">Seuls les parents peuvent soumettre des demandes d'inscription.</p>
+                  </div>
+                ) : !school.enrollmentOpen ? (
+                  <div className="bg-ivory-100 rounded-xl p-8 text-center border border-forest-100">
+                    <p className="text-gray-600">Les inscriptions sont fermées pour le moment.</p>
                   </div>
                 ) : (
                   <div className="bg-white rounded-xl border border-forest-100 p-6">
@@ -354,16 +474,23 @@ export default function SchoolDetail({ user }: Props) {
                       <Star className="w-4 h-4 text-gold-500 fill-gold-500" />{school.rating}/5
                     </span>
                   </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Inscriptions</span>
+                    <span className={`font-medium ${school.enrollmentOpen ? 'text-green-700' : 'text-red-700'}`}>
+                      {school.enrollmentOpen ? 'Ouvertes' : 'Fermées'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* CTA */}
               <button
                 onClick={() => setActiveTab('apply')}
-                className="w-full px-6 py-4 bg-gradient-to-r from-forest-600 to-forest-500 text-white rounded-xl font-semibold hover:from-forest-700 hover:to-forest-600 transition-all shadow-lg shadow-forest-600/20 flex items-center justify-center gap-2"
+                disabled={!school.enrollmentOpen}
+                className="w-full px-6 py-4 bg-gradient-to-r from-forest-600 to-forest-500 text-white rounded-xl font-semibold hover:from-forest-700 hover:to-forest-600 transition-all shadow-lg shadow-forest-600/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <BookOpen className="w-5 h-5" />
-                S'inscrire maintenant
+                {school.enrollmentOpen ? "S'inscrire maintenant" : 'Inscriptions fermées'}
               </button>
             </div>
           </div>

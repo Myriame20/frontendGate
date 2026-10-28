@@ -125,3 +125,68 @@ body {
 .status-approved { background: #D1FAE5; color: #065F46; }
 .status-rejected { background: #FEE2E2; color: #991B1B; }
 .status-review { background: #DBEAFE; color: #1E40AF; }
+
+/* Enrollment status */
+.enrollment-open { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+.enrollment-closed { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+
+/* Video player styles */
+.video-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 1rem;
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .animate-fade-in-up,
+  .animate-slide-in-right,
+  .animate-pulse-glow {
+    animation: none !important;
+  }
+  
+  video[autoplay] {
+    pause: true;
+  }
+}
+
+/* Media upload zone */
+.upload-zone {
+  border: 2px dashed #2D6A4F;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  border-color: #1B4332;
+  background: rgba(45, 106, 79, 0.05);
+}
+
+.upload-zone.dragging {
+  border-color: #1B4332;
+  background: rgba(45, 106, 79, 0.1);
+}

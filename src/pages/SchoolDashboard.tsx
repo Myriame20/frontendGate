@@ -1,21 +1,22 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, FileText, MessageSquare, Settings, CheckCircle, XCircle, Clock, AlertCircle, Send, Building2, UserCheck, Shield } from 'lucide-react';
-import { getSchoolAdmins, getApplications, saveApplications, getMessages, saveMessages, schools, generateId, type Application, type Message } from '../data/store';
+import { Users, FileText, MessageSquare, Settings, CheckCircle, XCircle, Clock, AlertCircle, Send, Building2, UserCheck, Shield, Image as ImageIcon, Upload, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { getSchoolAdmins, getApplications, saveApplications, getMessages, saveMessages, getSchools, generateId, saveSchoolMedia, removeSchoolMedia, updateSchoolEnrollment, type Application, type Message, type UploadedMedia } from '../data/store';
 
 interface Props {
   adminId: string;
 }
 
 export default function SchoolDashboard({ adminId }: Props) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'applications' | 'messages' | 'profile'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'applications' | 'messages' | 'media' | 'profile'>('overview');
   const [applications, setApplications] = useState<Application[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [selectedParent, setSelectedParent] = useState('');
 
   const admin = getSchoolAdmins().find(a => a.id === adminId);
-  const school = schools.find(s => s.id === admin?.schoolId);
+  const allSchools = getSchools();
+  const school = allSchools.find(s => s.id === admin?.schoolId);
 
   useEffect(() => {
     if (admin?.schoolId) {
@@ -59,10 +60,64 @@ export default function SchoolDashboard({ adminId }: Props) {
     { label: 'Messages', value: messages.length, icon: MessageSquare, color: 'bg-purple-50 text-purple-700' },
   ];
 
+  // Media management
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [enrollmentOpen, setEnrollmentOpen] = useState(school?.enrollmentOpen ?? true);
+
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || !admin?.schoolId) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm'];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    Array.from(files).forEach(file => {
+      if (!allowedTypes.includes(file.type)) {
+        alert(`Type de fichier non supporté: ${file.name}. Formats acceptés: JPEG, PNG, WebP, MP4, WebM`);
+        return;
+      }
+      if (file.size > maxSize) {
+        alert(`Fichier trop volumineux: ${file.name}. Taille max: 10MB`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const media: UploadedMedia = {
+          id: generateId(),
+          type: file.type.startsWith('video') ? 'video' : 'image',
+          url: ev.target?.result as string,
+          name: file.name,
+          uploadedAt: new Date().toISOString()
+        };
+        saveSchoolMedia(admin!.schoolId, media);
+        // Refresh school data
+        window.location.reload();
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemoveMedia = (mediaId: string) => {
+    if (!admin?.schoolId) return;
+    if (confirm('Supprimer ce média ?')) {
+      removeSchoolMedia(admin.schoolId, mediaId);
+      window.location.reload();
+    }
+  };
+
+  const handleToggleEnrollment = () => {
+    if (!admin?.schoolId) return;
+    const newState = !enrollmentOpen;
+    setEnrollmentOpen(newState);
+    updateSchoolEnrollment(admin.schoolId, newState);
+  };
+
   const tabs = [
     { id: 'overview', label: 'Tableau de bord', icon: Users },
     { id: 'applications', label: 'Candidatures', icon: FileText, count: applications.filter(a => a.status === 'pending').length },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
+    { id: 'media', label: 'Médias', icon: ImageIcon },
     { id: 'profile', label: 'Profil école', icon: Settings },
   ];
 
@@ -342,6 +397,98 @@ export default function SchoolDashboard({ adminId }: Props) {
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Media Management */}
+        {activeTab === 'media' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div className="space-y-6">
+              {/* Enrollment Status Toggle */}
+              <div className="bg-white rounded-xl border border-forest-100 p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-forest-800 flex items-center gap-2">
+                      <ToggleRight className="w-5 h-5" /> Statut des inscriptions
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {enrollmentOpen 
+                        ? 'Les parents peuvent soumettre des demandes d\'inscription' 
+                        : 'Les inscriptions sont actuellement fermées'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleToggleEnrollment}
+                    className={`relative w-14 h-7 rounded-full transition-colors ${
+                      enrollmentOpen ? 'bg-forest-600' : 'bg-gray-300'
+                    }`}
+                  >
+                    <div className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      enrollmentOpen ? 'translate-x-7' : 'translate-x-0.5'
+                    }`}></div>
+                  </button>
+                </div>
+                <div className={`mt-3 px-3 py-2 rounded-lg text-sm font-medium ${
+                  enrollmentOpen ? 'enrollment-open' : 'enrollment-closed'
+                }`}>
+                  {enrollmentOpen ? '🟢 Inscriptions ouvertes' : '🔴 Inscriptions fermées'}
+                </div>
+              </div>
+
+              {/* Upload Media */}
+              <div className="bg-white rounded-xl border border-forest-100 p-6">
+                <h3 className="font-semibold text-forest-800 mb-4 flex items-center gap-2">
+                  <Upload className="w-5 h-5" /> Ajouter des médias
+                </h3>
+                <label className="upload-zone block">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+                    onChange={handleMediaUpload}
+                    className="hidden"
+                  />
+                  <ImageIcon className="w-10 h-10 text-forest-400 mx-auto mb-3" />
+                  <p className="text-forest-700 font-medium">Cliquez ou glissez vos fichiers ici</p>
+                  <p className="text-sm text-gray-500 mt-1">Images (JPEG, PNG, WebP) ou Vidéos (MP4, WebM) • Max 10MB</p>
+                </label>
+              </div>
+
+              {/* Uploaded Media */}
+              <div className="bg-white rounded-xl border border-forest-100 p-6">
+                <h3 className="font-semibold text-forest-800 mb-4">Médias importés</h3>
+                {school.uploadedMedia.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <ImageIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>Aucun média importé</p>
+                    <p className="text-sm mt-1">Importez des photos et vidéos pour enrichir le profil de votre école</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {school.uploadedMedia.map((media) => (
+                      <div key={media.id} className="relative group aspect-square rounded-xl overflow-hidden border border-gray-200">
+                        {media.type === 'image' ? (
+                          <img src={media.url} alt={media.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <video src={media.url} className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            onClick={() => handleRemoveMedia(media.id)}
+                            className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
+                          <span className="text-xs text-white truncate block">{media.name}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

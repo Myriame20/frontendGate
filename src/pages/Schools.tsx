@@ -1,47 +1,55 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Star, Users, Filter, X } from 'lucide-react';
-import { schools } from '../data/store';
+import { Search, MapPin, Star, Users, Filter, X, BookOpen, GraduationCap } from 'lucide-react';
+import { getSchools } from '../data/store';
 
 export default function Schools() {
+  const allSchools = getSchools().filter(s => s.isVisible);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [cityFilter, setCityFilter] = useState('');
+  const [enrollmentFilter, setEnrollmentFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
   const types = ['Maternelle', 'Primaire', 'Secondaire', 'Complexe'];
-  const cities = [...new Set(schools.map(s => s.city))];
+  const cities = [...new Set(allSchools.map(s => s.city))];
 
-  const filtered = schools.filter(s => {
+  const filtered = allSchools.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.city.toLowerCase().includes(search.toLowerCase()) ||
       s.province.toLowerCase().includes(search.toLowerCase());
     const matchType = !typeFilter || s.type === typeFilter;
     const matchCity = !cityFilter || s.city === cityFilter;
-    return matchSearch && matchType && matchCity;
+    const matchEnrollment = !enrollmentFilter || 
+      (enrollmentFilter === 'open' && s.enrollmentOpen) ||
+      (enrollmentFilter === 'closed' && !s.enrollmentOpen);
+    return matchSearch && matchType && matchCity && matchEnrollment;
   });
 
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-br from-forest-700 to-forest-900 py-16 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h1
+      <div className="bg-gradient-to-br from-forest-700 to-forest-900 py-16 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}></div>
+        <div className="max-w-7xl mx-auto text-center relative">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-bold text-white font-serif"
           >
-            Nos Écoles Partenaires
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-4 text-forest-100 text-lg"
-          >
-            Trouvez l'établissement idéal pour votre enfant
-          </motion.p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-forest-100 text-sm mb-4 border border-white/10">
+              <GraduationCap className="w-4 h-4" />
+              <span>{allSchools.length} établissements partenaires</span>
+            </div>
+            <h1 className="text-4xl font-bold text-white font-serif">
+              Nos Écoles Partenaires
+            </h1>
+            <p className="mt-4 text-forest-100 text-lg">
+              Trouvez l'établissement idéal pour votre enfant
+            </p>
+          </motion.div>
 
           {/* Search Bar */}
           <motion.div
@@ -78,7 +86,7 @@ export default function Schools() {
           animate={{ opacity: 1, height: 'auto' }}
           className="bg-white border-b border-forest-100 px-4 py-6"
         >
-          <div className="max-w-7xl mx-auto flex flex-wrap gap-4 items-center">
+          <div className="max-w-7xl mx-auto flex flex-wrap gap-4 items-end">
             <div>
               <label className="text-sm font-medium text-gray-600 block mb-1">Type</label>
               <select
@@ -101,9 +109,21 @@ export default function Schools() {
                 {cities.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-            {(typeFilter || cityFilter) && (
+            <div>
+              <label className="text-sm font-medium text-gray-600 block mb-1">Inscriptions</label>
+              <select
+                value={enrollmentFilter}
+                onChange={(e) => setEnrollmentFilter(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-forest-400"
+              >
+                <option value="">Tous</option>
+                <option value="open">Inscriptions ouvertes</option>
+                <option value="closed">Inscriptions fermées</option>
+              </select>
+            </div>
+            {(typeFilter || cityFilter || enrollmentFilter) && (
               <button
-                onClick={() => { setTypeFilter(''); setCityFilter(''); }}
+                onClick={() => { setTypeFilter(''); setCityFilter(''); setEnrollmentFilter(''); }}
                 className="flex items-center gap-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
               >
                 <X className="w-4 h-4" />
@@ -130,16 +150,23 @@ export default function Schools() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
             >
-              <Link to={`/schools/${school.id}`} className="block card-hover bg-white rounded-2xl overflow-hidden border border-forest-100 shadow-sm h-full">
-                <div className="relative h-48 overflow-hidden">
+              <Link to={`/schools/${school.id}`} className="block card-hover bg-white rounded-2xl overflow-hidden border border-forest-100 shadow-sm h-full group">
+                <div className="relative h-52 overflow-hidden">
                   <img
                     src={school.coverImage}
                     alt={school.name}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                  <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-sm font-medium text-forest-700">
-                    {school.type}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                  <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-sm font-medium text-forest-700">
+                      {school.type}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      school.enrollmentOpen ? 'enrollment-open' : 'enrollment-closed'
+                    }`}>
+                      {school.enrollmentOpen ? '🟢 Ouvert' : '🔴 Fermé'}
+                    </span>
                   </div>
                   <div className="absolute top-4 right-4 flex items-center gap-1 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-full text-sm">
                     <Star className="w-3.5 h-3.5 text-gold-500 fill-gold-500" />
@@ -159,12 +186,18 @@ export default function Schools() {
                   </div>
                   <p className="text-sm text-gray-600 line-clamp-2 mb-4">{school.description}</p>
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <Users className="w-4 h-4 text-forest-500" />
-                      {school.students} élèves
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <Users className="w-4 h-4 text-forest-500" />
+                        {school.students}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <BookOpen className="w-4 h-4 text-forest-500" />
+                        {school.programs.length}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-forest-600">
-                      Voir le profil →
+                    <span className="text-sm font-medium text-forest-600 group-hover:translate-x-1 transition-transform">
+                      Voir →
                     </span>
                   </div>
                 </div>
