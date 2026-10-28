@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCurrentUser, getSchoolAdmins, getSchools, getApplications, saveApplications, School, Application } from '../data/store';
+import { getCurrentUser, getSchoolAdmins, getSchools, saveSchools, getApplications, saveApplications, School, Application } from '../data/store';
 import { Link, useNavigate } from 'react-router-dom';
 import { Users, FileText, Settings, BarChart3, CheckCircle, Clock, XCircle, Eye, GraduationCap } from 'lucide-react';
 
@@ -38,6 +38,18 @@ export default function SchoolDashboard() {
     if (idx !== -1) {
       apps[idx].status = status;
       apps[idx].viewedBySchool = true;
+      
+      // Mise à jour des places disponibles si approuvé
+      if (status === 'approved' && school) {
+        const schools = getSchools();
+        const schoolIdx = schools.findIndex(s => s.id === school.id);
+        if (schoolIdx !== -1 && schools[schoolIdx].availablePlaces > 0) {
+          schools[schoolIdx].availablePlaces -= 1;
+          saveSchools(schools);
+          setSchool(schools[schoolIdx]);
+        }
+      }
+      
       saveApplications(apps);
       setApplications(apps.filter(a => a.schoolId === school?.id));
       setSelectedApp(null);
