@@ -1,31 +1,37 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
+import SchoolsPage from './pages/SchoolsPage';
+import SchoolDetailPage from './pages/SchoolDetailPage';
 import SchoolOnboarding from './pages/SchoolOnboarding';
 import SchoolDashboard from './pages/SchoolDashboard';
-import PageEditor from './pages/PageEditor';
-import PublicSchoolPage from './pages/PublicSchoolPage';
+import ParentAuth from './pages/ParentAuth';
 import ParentDashboard from './pages/ParentDashboard';
-import SchoolsSearch from './pages/SchoolsSearch';
-import SchoolDetailParent from './pages/SchoolDetailParent';
+import ApplicationForm from './pages/ApplicationForm';
+import PlatformAdminDashboard from './pages/PlatformAdminDashboard';
 
-export default function App() {
+function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
+        {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/ecoles" element={<SchoolsSearch />} />
-        <Route path="/ecole/:slug" element={<SchoolDetailParent />} />
+        <Route path="/schools" element={<SchoolsPage />} />
+        <Route path="/schools/:schoolId" element={<SchoolDetailPage />} />
         
-        {/* School */}
-        <Route path="/ecole/onboarding" element={<SchoolOnboarding />} />
-        <Route path="/ecole/dashboard" element={<SchoolDashboard />} />
-        <Route path="/ecole/editor" element={<PageEditor />} />
-        <Route path="/ecole/page/:slug" element={<PublicSchoolPage />} />
+        {/* School routes */}
+        <Route path="/school/onboarding" element={<SchoolOnboarding />} />
+        <Route path="/school/dashboard" element={<SchoolDashboard />} />
         
-        {/* Parent */}
+        {/* Parent routes */}
+        <Route path="/parent/auth" element={<ParentAuth />} />
         <Route path="/parent/dashboard" element={<ParentDashboard />} />
+        <Route path="/apply/:schoolId" element={<ApplicationForm />} />
+        
+        {/* Platform admin routes */}
+        <Route path="/admin" element={<PlatformAdminDashboard />} />
       </Routes>
     </BrowserRouter>
   );
 }
+
+export default App;

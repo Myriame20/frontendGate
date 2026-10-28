@@ -3,52 +3,53 @@ import { motion } from 'framer-motion';
 import { 
   ArrowRight, Check, Sparkles, Users, Globe, Shield, 
   Zap, BarChart3, MessageSquare, Calendar, Star,
-  Play, GraduationCap, School, UserCheck
+  Play, GraduationCap, School, UserCheck, Award, TrendingUp
 } from 'lucide-react';
+import EduGateLogo from '../components/EduGateLogo';
 
 export default function LandingPage() {
   const features = [
     {
       icon: Globe,
-      title: 'Page publique personnalisable',
-      desc: 'Créez une vitrine unique pour votre école avec notre éditeur intuitif.',
-      gradient: 'from-gabon-green to-gabon-green-dark',
+      title: 'Pages Écoles Personnalisables',
+      desc: 'Créez une vitrine unique pour votre établissement avec notre éditeur intuitif.',
+      gradient: 'from-emerald-500 to-teal-600',
       for: 'schools'
     },
     {
       icon: Users,
-      title: 'Gestion d\'équipe complète',
+      title: 'Gestion d\'Équipe Complète',
       desc: 'Invitez votre personnel avec des rôles et permissions granulaires.',
-      gradient: 'from-gabon-blue to-gabon-blue-dark',
+      gradient: 'from-blue-500 to-indigo-600',
       for: 'schools'
     },
     {
       icon: MessageSquare,
-      title: 'Communication directe',
+      title: 'Communication Directe',
       desc: 'Échangez avec les écoles et gérez les candidatures en un clic.',
-      gradient: 'from-gabon-yellow to-gabon-yellow-dark',
+      gradient: 'from-purple-500 to-pink-600',
       for: 'parents'
     },
     {
       icon: BarChart3,
-      title: 'Analytics avancés',
-      desc: 'Suivez les performances de votre page et optimisez votre visibilité.',
-      gradient: 'from-gabon-green to-gabon-green-dark',
-      for: 'schools'
+      title: 'Analytics & Résultats',
+      desc: 'Suivez les performances, publiez les résultats et comparez les écoles.',
+      gradient: 'from-orange-500 to-red-600',
+      for: 'both'
     },
     {
       icon: Shield,
-      title: 'Sécurité enterprise',
-      desc: 'Vos données sont protégées avec un chiffrement de bout en bout.',
-      gradient: 'from-gabon-blue to-gabon-blue-dark',
+      title: 'Places en Temps Réel',
+      desc: 'Système anti-corruption : voyez les places disponibles en direct.',
+      gradient: 'from-green-500 to-emerald-600',
       for: 'both'
     },
     {
       icon: Zap,
-      title: 'Ultra rapide',
-      desc: 'Performance optimale pour une expérience utilisateur fluide.',
-      gradient: 'from-gabon-yellow to-gabon-yellow-dark',
-      for: 'both'
+      title: 'Dossiers Annuels',
+      desc: 'Traçabilité complète : élèves, notes, résultats par année scolaire.',
+      gradient: 'from-yellow-500 to-orange-600',
+      for: 'schools'
     }
   ];
 
@@ -59,8 +60,7 @@ export default function LandingPage() {
       desc: 'Pour découvrir la plateforme',
       features: ['Page publique basique', '1 membre', '50 candidatures/mois', 'Support email'],
       cta: 'Commencer gratuitement',
-      popular: false,
-      color: 'neutral'
+      popular: false
     },
     {
       name: 'Pro',
@@ -68,8 +68,7 @@ export default function LandingPage() {
       desc: 'Pour les écoles établies',
       features: ['Page complète personnalisable', '5 membres', 'Candidatures illimitées', 'Galerie illimitée', 'Vidéos', 'Analytics', 'Support prioritaire'],
       cta: 'Essai gratuit 14 jours',
-      popular: true,
-      color: 'green'
+      popular: true
     },
     {
       name: 'Premium',
@@ -77,8 +76,7 @@ export default function LandingPage() {
       desc: 'Pour les institutions',
       features: ['Tout du Pro +', 'Membres illimités', 'Domaine personnalisé', 'Analytics avancés', 'API access', 'Chat en direct', 'Support dédié', 'Formation incluse'],
       cta: 'Nous contacter',
-      popular: false,
-      color: 'blue'
+      popular: false
     }
   ];
 
@@ -95,26 +93,20 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-neutral-200/50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-gabon-green to-gabon-green-dark rounded-xl flex items-center justify-center shadow-lg shadow-gabon-green/20">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-xl font-bold gradient-text-green font-display">EduGate</span>
-                <span className="text-xs text-neutral-500 block -mt-1">Gabon</span>
-              </div>
-            </div>
+            <Link to="/" className="flex items-center gap-2">
+              <EduGateLogo size="md" />
+            </Link>
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Fonctionnalités</a>
               <a href="#pricing" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Tarifs</a>
-              <Link to="/ecoles" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Explorer les écoles</Link>
+              <Link to="/schools" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">Explorer les écoles</Link>
             </div>
             <div className="flex items-center gap-3">
               <Link to="/parent/dashboard" className="hidden sm:block text-sm font-medium text-neutral-700 hover:text-neutral-900 transition-colors">
                 Espace Parent
               </Link>
               <Link 
-                to="/ecole/onboarding" 
+                to="/school/onboarding" 
                 className="btn-primary flex items-center gap-2 text-sm"
               >
                 Créer ma page école
@@ -138,9 +130,9 @@ export default function LandingPage() {
               transition={{ duration: 0.6 }}
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-neutral-200 shadow-sm mb-8">
-                <Sparkles className="w-4 h-4 text-gabon-yellow" />
+                <Sparkles className="w-4 h-4 text-yellow-500" />
                 <span className="text-sm font-medium text-neutral-700">
-                  La plateforme N°1 pour les écoles et les familles au Gabon
+                  La plateforme N°1 pour les écoles et les familles
                 </span>
               </div>
             </motion.div>
@@ -174,7 +166,7 @@ export default function LandingPage() {
               className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
             >
               <Link 
-                to="/ecole/onboarding"
+                to="/school/onboarding"
                 className="btn-primary flex items-center justify-center gap-2 px-8 py-4 text-base"
               >
                 <School className="w-5 h-5" />
@@ -182,7 +174,7 @@ export default function LandingPage() {
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link 
-                to="/ecoles"
+                to="/schools"
                 className="btn-secondary flex items-center justify-center gap-2 px-8 py-4 text-base"
               >
                 <UserCheck className="w-5 h-5" />
@@ -198,12 +190,16 @@ export default function LandingPage() {
               className="mt-12 flex items-center justify-center gap-6 text-sm text-neutral-500"
             >
               <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-gabon-green" />
+                <Check className="w-4 h-4 text-emerald-500" />
                 <span>Gratuit pour les parents</span>
               </div>
               <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-gabon-green" />
-                <span>Essai gratuit pour les écoles</span>
+                <Check className="w-4 h-4 text-emerald-500" />
+                <span>Places en temps réel</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-500" />
+                <span>Écoles vérifiées</span>
               </div>
             </motion.div>
           </div>
@@ -287,16 +283,16 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-12">
             {/* For Schools */}
             <div>
-              <h3 className="text-2xl font-bold text-gabon-green mb-6 flex items-center gap-3">
+              <h3 className="text-2xl font-bold text-emerald-600 mb-6 flex items-center gap-3">
                 <School className="w-8 h-8" />
                 Pour les écoles
               </h3>
               <div className="space-y-6">
                 {[
-                  { step: '01', title: 'Créez votre compte', desc: 'Inscrivez-vous en 2 minutes avec votre email professionnel.' },
-                  { step: '02', title: 'Personnalisez votre page', desc: 'Ajoutez vos informations, photos et programmes avec notre éditeur.' },
-                  { step: '03', title: 'Gérez votre équipe', desc: 'Invitez votre personnel avec des rôles et permissions.' },
-                  { step: '04', title: 'Recevez les candidatures', desc: 'Les parents découvrent votre école et postulent directement.' }
+                  { step: '01', title: 'Créez votre compte', desc: 'Inscrivez-vous et soumettez votre école pour vérification.' },
+                  { step: '02', title: 'Validation par notre équipe', desc: 'Nous vérifions l\'existence de votre établissement.' },
+                  { step: '03', title: 'Personnalisez votre page', desc: 'Ajoutez vos informations, photos et programmes.' },
+                  { step: '04', title: 'Gérez les inscriptions', desc: 'Recevez les candidatures et gérez les places.' }
                 ].map((item, i) => (
                   <motion.div
                     key={i}
@@ -306,7 +302,7 @@ export default function LandingPage() {
                     viewport={{ once: true }}
                     className="relative pl-16"
                   >
-                    <div className="absolute left-0 top-0 text-5xl font-bold text-gabon-green/20 font-display">
+                    <div className="absolute left-0 top-0 text-5xl font-bold text-emerald-500/20 font-display">
                       {item.step}
                     </div>
                     <h4 className="text-lg font-semibold text-neutral-900 mb-2">{item.title}</h4>
@@ -318,16 +314,16 @@ export default function LandingPage() {
 
             {/* For Parents */}
             <div>
-              <h3 className="text-2xl font-bold text-gabon-blue mb-6 flex items-center gap-3">
+              <h3 className="text-2xl font-bold text-blue-600 mb-6 flex items-center gap-3">
                 <UserCheck className="w-8 h-8" />
                 Pour les parents
               </h3>
               <div className="space-y-6">
                 {[
                   { step: '01', title: 'Créez votre compte', desc: 'Inscrivez-vous gratuitement pour accéder à toutes les fonctionnalités.' },
-                  { step: '02', title: 'Explorez les écoles', desc: 'Découvrez les établissements, consultez leurs pages et comparez.' },
-                  { step: '03', title: 'Postulez en ligne', desc: 'Soumettez vos candidatures et téléchargez les documents requis.' },
-                  { step: '04', title: 'Suivez vos demandes', desc: 'Recevez des notifications et communiquez avec les écoles.' }
+                  { step: '02', title: 'Explorez les écoles', desc: 'Découvrez les établissements vérifiés et consultez leurs pages.' },
+                  { step: '03', title: 'Vérifiez les places', desc: 'Consultez les places disponibles en temps réel avant de postuler.' },
+                  { step: '04', title: 'Postulez en ligne', desc: 'Soumettez vos candidatures et suivez leur statut.' }
                 ].map((item, i) => (
                   <motion.div
                     key={i}
@@ -337,7 +333,7 @@ export default function LandingPage() {
                     viewport={{ once: true }}
                     className="relative pl-16"
                   >
-                    <div className="absolute left-0 top-0 text-5xl font-bold text-gabon-blue/20 font-display">
+                    <div className="absolute left-0 top-0 text-5xl font-bold text-blue-500/20 font-display">
                       {item.step}
                     </div>
                     <h4 className="text-lg font-semibold text-neutral-900 mb-2">{item.title}</h4>
@@ -370,11 +366,11 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className={`relative card-premium p-8 ${plan.popular ? 'ring-2 ring-gabon-green scale-105' : ''}`}
+                className={`relative card-premium p-8 ${plan.popular ? 'ring-2 ring-emerald-500 scale-105' : ''}`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <div className="px-4 py-1 bg-gradient-to-r from-gabon-green to-gabon-green-dark text-white text-sm font-semibold rounded-full shadow-lg">
+                    <div className="px-4 py-1 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-sm font-semibold rounded-full shadow-lg">
                       Le plus populaire
                     </div>
                   </div>
@@ -390,7 +386,7 @@ export default function LandingPage() {
                 <ul className="space-y-4 mb-8">
                   {plan.features.map((feature, j) => (
                     <li key={j} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-gabon-green flex-shrink-0 mt-0.5" />
+                      <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                       <span className="text-neutral-700">{feature}</span>
                     </li>
                   ))}
@@ -398,8 +394,6 @@ export default function LandingPage() {
                 <button className={`w-full py-3 rounded-xl font-semibold transition-all ${
                   plan.popular 
                     ? 'btn-primary' 
-                    : plan.color === 'blue'
-                    ? 'btn-secondary'
                     : 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
                 }`}>
                   {plan.cta}
@@ -413,26 +407,26 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-gabon-green via-gabon-green-dark to-gabon-blue p-12 sm:p-16 text-center">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-blue-600 p-12 sm:p-16 text-center">
             <div className="absolute inset-0 grid-bg opacity-10"></div>
             <div className="relative">
               <h2 className="text-4xl sm:text-5xl font-bold text-white font-display mb-6">
                 Prêt à commencer ?
               </h2>
               <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-                Rejoignez des centaines d'écoles et de familles qui font confiance à EduGate Gabon.
+                Rejoignez des centaines d'écoles et de familles qui font confiance à EduGate.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
-                  to="/ecole/onboarding"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-gabon-green rounded-xl font-semibold text-lg hover:bg-neutral-50 transition-all shadow-xl group"
+                  to="/school/onboarding"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-emerald-700 rounded-xl font-semibold text-lg hover:bg-neutral-50 transition-all shadow-xl group"
                 >
                   Créer ma page école
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link 
-                  to="/ecoles"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gabon-yellow text-neutral-900 rounded-xl font-semibold text-lg hover:bg-gabon-yellow-dark transition-all shadow-xl group"
+                  to="/schools"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-yellow-400 text-neutral-900 rounded-xl font-semibold text-lg hover:bg-yellow-500 transition-all shadow-xl group"
                 >
                   Explorer les écoles
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -448,13 +442,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-gabon-green to-gabon-green-dark rounded-xl flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-lg font-bold gradient-text-green font-display">EduGate Gabon</span>
-                <p className="text-xs text-neutral-500">© 2026 Tous droits réservés</p>
-              </div>
+              <EduGateLogo size="md" />
+              <p className="text-xs text-neutral-500">© 2026 Tous droits réservés</p>
             </div>
             <div className="flex items-center gap-6 text-sm text-neutral-600">
               <a href="#" className="hover:text-neutral-900 transition-colors">Confidentialité</a>

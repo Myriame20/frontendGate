@@ -1,399 +1,319 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowRight, ArrowLeft, Check, Building2, User, Mail, 
-  Phone, MapPin, GraduationCap, Sparkles
-} from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { getSchools, saveSchools, getSchoolAdmins, saveSchoolAdmins, generateId, School, SchoolAdmin } from '../data/store';
+import { GraduationCap, ArrowRight, CheckCircle, Clock } from 'lucide-react';
 
 export default function SchoolOnboarding() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    schoolName: '',
-    email: '',
-    phone: '',
-    directorName: '',
-    directorEmail: '',
-    city: '',
-    type: '',
-    description: ''
-  });
+  const [schoolName, setSchoolName] = useState('');
+  const [schoolType, setSchoolType] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [description, setDescription] = useState('');
+  const [adminName, setAdminName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
 
-  const steps = [
-    { num: 1, title: 'Informations école' },
-    { num: 2, title: 'Directeur' },
-    { num: 3, title: 'Localisation' },
-    { num: 4, title: 'Confirmation' }
-  ];
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Create school with pending status
+    const newSchool: School = {
+      id: generateId(),
+      name: schoolName,
+      logo: '🏫',
+      coverImage: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80',
+      type: schoolType as any,
+      address,
+      city,
+      province: '',
+      phone,
+      email,
+      website: '',
+      description,
+      founded: new Date().getFullYear(),
+      students: 0,
+      teachers: 0,
+      programs: [],
+      languages: ['Français'],
+      fees: [],
+      rating: 0,
+      gallery: [],
+      videos: [],
+      features: [],
+      adminEmail,
+      enrollmentOpen: false,
+      isVisible: false,
+      isVerified: false,
+      verificationStatus: 'pending',
+      uploadedMedia: [],
+      admissionRequirements: [],
+      totalPlaces: 0,
+      availablePlaces: 0,
+      academicYear: '2025-2026'
+    };
 
-  const schoolTypes = [
-    'Maternelle',
-    'Primaire',
-    'Secondaire',
-    'Complexe (Maternelle à Secondaire)',
-    'Technique',
-    'International'
-  ];
+    const schools = getSchools();
+    schools.push(newSchool);
+    saveSchools(schools);
 
-  const cities = [
-    'Libreville', 'Port-Gentil', 'Franceville', 'Oyem', 
-    'Moanda', 'Lambaréné', 'Mouila', 'Tchibanga'
-  ];
+    // Create admin account
+    const newAdmin: SchoolAdmin = {
+      id: generateId(),
+      schoolId: newSchool.id,
+      name: adminName,
+      email: adminEmail,
+      password: adminPassword,
+      role: 'super_admin',
+      permissions: ['all']
+    };
 
-  const handleNext = () => {
-    if (step < 4) setStep(step + 1);
+    const admins = getSchoolAdmins();
+    admins.push(newAdmin);
+    saveSchoolAdmins(admins);
+
+    setSubmitted(true);
   };
 
-  const handlePrev = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
-  return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <div className="border-b border-neutral-200 bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-gabon-green to-gabon-green-dark rounded-xl flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-xl font-bold gradient-text-green font-display">EduGate</span>
-                <span className="text-xs text-neutral-500 block -mt-1">Gabon</span>
-              </div>
-            </Link>
-            <div className="text-sm text-neutral-600">
-              Déjà inscrit ?{' '}
-              <Link to="/dashboard" className="text-forest-600 font-medium hover:text-forest-700">
-                Se connecter
-              </Link>
-            </div>
+  if (submitted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-md text-center">
+          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Clock className="w-8 h-8 text-yellow-600" />
           </div>
+          <h2 className="text-2xl font-bold text-neutral-900 mb-4">Demande envoyée !</h2>
+          <p className="text-neutral-600 mb-6">
+            Votre école a été soumise pour vérification. Notre équipe va vérifier l'existence de votre établissement et vous recevrez une notification dès que votre page sera activée.
+          </p>
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mb-6">
+            <p className="text-sm text-yellow-800">
+              <strong>Prochaine étape :</strong> Vous recevrez un email de confirmation avec vos identifiants de connexion une fois votre école vérifiée.
+            </p>
+          </div>
+          <Link to="/" className="btn-primary">
+            Retour à l'accueil
+          </Link>
         </div>
       </div>
+    );
+  }
 
-      {/* Progress Steps */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="max-w-3xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
-            {steps.map((s, i) => (
-              <div key={s.num} className="flex items-center flex-1">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                    step >= s.num 
-                      ? 'bg-gradient-to-br from-gabon-green to-gabon-green-dark text-white shadow-lg shadow-gabon-green/20' 
-                      : 'bg-neutral-100 text-neutral-400'
-                  }`}>
-                    {step > s.num ? <Check className="w-5 h-5" /> : s.num}
-                  </div>
-                  <span className={`text-sm font-medium hidden sm:block ${
-                    step >= s.num ? 'text-neutral-900' : 'text-neutral-400'
-                  }`}>
-                    {s.title}
-                  </span>
+  return (
+    <div className="min-h-screen bg-neutral-50 py-12 px-6">
+      <div className="max-w-2xl mx-auto">
+        <Link to="/" className="flex items-center gap-2 mb-8">
+          <GraduationCap className="w-8 h-8 text-emerald-600" />
+          <span className="text-xl font-bold">EduGate</span>
+        </Link>
+
+        <div className="card-premium p-8">
+          <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+            Créer votre page école
+          </h1>
+          <p className="text-neutral-600 mb-6">
+            Remplissez le formulaire ci-dessous. Votre école sera vérifiée par notre équipe avant d'être publiée.
+          </p>
+
+          {/* Progress */}
+          <div className="flex items-center justify-between mb-8">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className="flex items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                  step >= s ? 'bg-emerald-500 text-white' : 'bg-neutral-200 text-neutral-500'
+                }`}>
+                  {step > s ? <CheckCircle className="w-5 h-5" /> : s}
                 </div>
-                {i < steps.length - 1 && (
-                  <div className={`flex-1 h-0.5 mx-4 transition-all ${
-                    step > s.num ? 'bg-forest-500' : 'bg-neutral-200'
-                  }`}></div>
+                {s < 3 && (
+                  <div className={`w-20 h-1 mx-2 ${step > s ? 'bg-emerald-500' : 'bg-neutral-200'}`}></div>
                 )}
               </div>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* Form Content */}
-      <div className="max-w-3xl mx-auto px-6 py-12">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Step 1: School Info */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             {step === 1 && (
-              <div className="card-premium p-8">
-                <div className="mb-8">
-                  <h2 className="text-3xl font-bold text-neutral-900 font-display">
-                    Informations de l'école
-                  </h2>
-                  <p className="text-neutral-600 mt-2">
-                    Commençons par les informations de base de votre établissement.
-                  </p>
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Nom de l'école
+                  </label>
+                  <input
+                    type="text"
+                    value={schoolName}
+                    onChange={(e) => setSchoolName(e.target.value)}
+                    className="input-premium"
+                    required
+                  />
                 </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Nom de l'école *
-                    </label>
-                    <div className="relative">
-                      <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                      <input
-                        type="text"
-                        value={formData.schoolName}
-                        onChange={(e) => setFormData({...formData, schoolName: e.target.value})}
-                        className="input-premium pl-12"
-                        placeholder="Ex: Lycée Léon Mba"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Type d'établissement *
-                    </label>
-                    <select
-                      value={formData.type}
-                      onChange={(e) => setFormData({...formData, type: e.target.value})}
-                      className="input-premium"
-                    >
-                      <option value="">Sélectionner un type</option>
-                      {schoolTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Email de contact *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        className="input-premium pl-12"
-                        placeholder="contact@ecole.ga"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Téléphone *
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                        className="input-premium pl-12"
-                        placeholder="+241 01 00 00 00"
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Type d'établissement
+                  </label>
+                  <select
+                    value={schoolType}
+                    onChange={(e) => setSchoolType(e.target.value)}
+                    className="input-premium"
+                    required
+                  >
+                    <option value="">Sélectionner</option>
+                    <option value="Maternelle">Maternelle</option>
+                    <option value="Primaire">Primaire</option>
+                    <option value="Secondaire">Secondaire</option>
+                    <option value="Complexe">Complexe (Maternelle à Secondaire)</option>
+                  </select>
                 </div>
-              </div>
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="w-full btn-primary flex items-center justify-center gap-2"
+                >
+                  Suivant
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </>
             )}
 
-            {/* Step 2: Director Info */}
             {step === 2 && (
-              <div className="card-premium p-8">
-                <div className="mb-8">
-                  <h2 className="text-3xl font-bold text-neutral-900 font-display">
-                    Informations du directeur
-                  </h2>
-                  <p className="text-neutral-600 mt-2">
-                    Le directeur sera le super administrateur de votre page école.
-                  </p>
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Ville
+                  </label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="input-premium"
+                    required
+                  />
                 </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Nom complet du directeur *
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                      <input
-                        type="text"
-                        value={formData.directorName}
-                        onChange={(e) => setFormData({...formData, directorName: e.target.value})}
-                        className="input-premium pl-12"
-                        placeholder="Ex: Jean-Baptiste Mba"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Email du directeur *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                      <input
-                        type="email"
-                        value={formData.directorEmail}
-                        onChange={(e) => setFormData({...formData, directorEmail: e.target.value})}
-                        className="input-premium pl-12"
-                        placeholder="directeur@ecole.ga"
-                      />
-                    </div>
-                    <p className="text-xs text-neutral-500 mt-2">
-                      Un email de vérification sera envoyé à cette adresse.
-                    </p>
-                  </div>
-
-                  <div className="p-4 bg-forest-50 border border-forest-200 rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <Sparkles className="w-5 h-5 text-forest-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="font-semibold text-forest-900 text-sm">Super Administrateur</h4>
-                        <p className="text-sm text-forest-700 mt-1">
-                          Le directeur aura tous les droits : gérer l'équipe, modifier la page, 
-                          voir les candidatures, etc.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Adresse complète
+                  </label>
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="input-premium"
+                    required
+                  />
                 </div>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Email de contact
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="input-premium"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Téléphone
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="input-premium"
+                    required
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="flex-1 px-4 py-2 bg-neutral-100 text-neutral-700 rounded-lg font-medium hover:bg-neutral-200"
+                  >
+                    Retour
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    className="flex-1 btn-primary flex items-center justify-center gap-2"
+                  >
+                    Suivant
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </>
             )}
 
-            {/* Step 3: Location */}
             {step === 3 && (
-              <div className="card-premium p-8">
-                <div className="mb-8">
-                  <h2 className="text-3xl font-bold text-neutral-900 font-display">
-                    Localisation
-                  </h2>
-                  <p className="text-neutral-600 mt-2">
-                    Où se trouve votre établissement ?
-                  </p>
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Description de l'école
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="input-premium"
+                    rows={4}
+                    required
+                  />
                 </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Ville *
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
-                      <select
-                        value={formData.city}
-                        onChange={(e) => setFormData({...formData, city: e.target.value})}
-                        className="input-premium pl-12"
-                      >
-                        <option value="">Sélectionner une ville</option>
-                        {cities.map(city => (
-                          <option key={city} value={city}>{city}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Description de l'école
-                    </label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      rows={4}
-                      className="input-premium resize-none"
-                      placeholder="Présentez votre école en quelques lignes..."
-                    />
-                    <p className="text-xs text-neutral-500 mt-2">
-                      Cette description apparaîtra sur votre page publique.
-                    </p>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Nom du directeur/administrateur
+                  </label>
+                  <input
+                    type="text"
+                    value={adminName}
+                    onChange={(e) => setAdminName(e.target.value)}
+                    className="input-premium"
+                    required
+                  />
                 </div>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Email de connexion
+                  </label>
+                  <input
+                    type="email"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    className="input-premium"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Mot de passe
+                  </label>
+                  <input
+                    type="password"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    className="input-premium"
+                    required
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="flex-1 px-4 py-2 bg-neutral-100 text-neutral-700 rounded-lg font-medium hover:bg-neutral-200"
+                  >
+                    Retour
+                  </button>
+                  <button type="submit" className="flex-1 btn-primary flex items-center justify-center gap-2">
+                    Soumettre
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </>
             )}
-
-            {/* Step 4: Confirmation */}
-            {step === 4 && (
-              <div className="card-premium p-8">
-                <div className="mb-8">
-                  <h2 className="text-3xl font-bold text-neutral-900 font-display">
-                    Confirmation
-                  </h2>
-                  <p className="text-neutral-600 mt-2">
-                    Vérifiez les informations avant de créer votre page.
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="p-6 bg-neutral-50 rounded-xl space-y-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="text-sm text-neutral-500">École</div>
-                        <div className="font-semibold text-neutral-900">{formData.schoolName || '—'}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-neutral-500">Type</div>
-                        <div className="font-semibold text-neutral-900">{formData.type || '—'}</div>
-                      </div>
-                    </div>
-                    <div className="border-t border-neutral-200 pt-4">
-                      <div className="text-sm text-neutral-500">Directeur</div>
-                      <div className="font-semibold text-neutral-900">{formData.directorName || '—'}</div>
-                      <div className="text-sm text-neutral-600">{formData.directorEmail || '—'}</div>
-                    </div>
-                    <div className="border-t border-neutral-200 pt-4">
-                      <div className="text-sm text-neutral-500">Contact</div>
-                      <div className="font-semibold text-neutral-900">{formData.email || '—'}</div>
-                      <div className="text-sm text-neutral-600">{formData.phone || '—'}</div>
-                    </div>
-                    <div className="border-t border-neutral-200 pt-4">
-                      <div className="text-sm text-neutral-500">Ville</div>
-                      <div className="font-semibold text-neutral-900">{formData.city || '—'}</div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-forest-50 border border-forest-200 rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-forest-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="font-semibold text-forest-900 text-sm">Plan Gratuit</h4>
-                        <p className="text-sm text-forest-700 mt-1">
-                          Vous commencez avec le plan gratuit. Vous pourrez upgrader à tout moment.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between mt-8">
-          <button
-            onClick={handlePrev}
-            disabled={step === 1}
-            className="flex items-center gap-2 px-6 py-3 text-neutral-700 hover:text-neutral-900 disabled:opacity-0 disabled:cursor-not-allowed transition-all"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Précédent
-          </button>
-
-          {step < 4 ? (
-            <button
-              onClick={handleNext}
-              className="btn-primary flex items-center gap-2"
-            >
-              Suivant
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          ) : (
-            <Link
-              to="/dashboard"
-              className="btn-primary flex items-center gap-2"
-            >
-              Créer ma page
-              <Sparkles className="w-5 h-5" />
-            </Link>
-          )}
+          </form>
         </div>
       </div>
     </div>
