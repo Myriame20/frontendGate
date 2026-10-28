@@ -55,11 +55,11 @@ export default function SchoolOnboarding() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-forest-600 to-forest-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-gabon-green to-gabon-green-dark rounded-xl flex items-center justify-center">
                 <GraduationCap className="w-6 h-6 text-white" />
               </div>
               <div>
-                <span className="text-xl font-bold gradient-text font-display">EduGate</span>
+                <span className="text-xl font-bold gradient-text-green font-display">EduGate</span>
                 <span className="text-xs text-neutral-500 block -mt-1">Gabon</span>
               </div>
             </Link>
@@ -82,7 +82,7 @@ export default function SchoolOnboarding() {
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
                     step >= s.num 
-                      ? 'bg-gradient-to-br from-forest-600 to-forest-500 text-white shadow-lg shadow-forest-600/20' 
+                      ? 'bg-gradient-to-br from-gabon-green to-gabon-green-dark text-white shadow-lg shadow-gabon-green/20' 
                       : 'bg-neutral-100 text-neutral-400'
                   }`}>
                     {step > s.num ? <Check className="w-5 h-5" /> : s.num}

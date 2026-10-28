@@ -44,11 +44,11 @@ export default function SchoolDashboard() {
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-neutral-200 hidden lg:block">
         <div className="p-6">
           <Link to="/" className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-gradient-to-br from-forest-600 to-forest-500 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-gabon-green to-gabon-green-dark rounded-xl flex items-center justify-center">
               <GraduationCap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <span className="text-lg font-bold gradient-text font-display">EduGate</span>
+              <span className="text-lg font-bold gradient-text-green font-display">EduGate</span>
               <span className="text-xs text-neutral-500 block -mt-1">Dashboard</span>
             </div>
           </Link>
@@ -60,7 +60,7 @@ export default function SchoolDashboard() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                   activeTab === tab.id
-                    ? 'bg-forest-50 text-forest-700'
+                    ? 'bg-gabon-green/10 text-gabon-green'
                     : 'text-neutral-600 hover:bg-neutral-50'
                 }`}
               >
@@ -78,7 +78,7 @@ export default function SchoolDashboard() {
 
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-neutral-200">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-forest-500 to-forest-600 rounded-full flex items-center justify-center text-white font-semibold">
+            <div className="w-10 h-10 bg-gradient-to-br from-gabon-green to-gabon-green-dark rounded-full flex items-center justify-center text-white font-semibold">
               MN
             </div>
             <div className="flex-1 min-w-0">
@@ -115,11 +115,10 @@ export default function SchoolDashboard() {
                   <Bell className="w-5 h-5" />
                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
-                <Link 
-                  to="/editor"
-                  className="btn-primary flex items-center gap-2 text-sm"
-                >
-                  <Edit className="w-4 h-4" />
+                  <Link 
+                    to="/ecole/editor"
+                    className="btn-primary flex items-center gap-2 text-sm"
+                  >                  <Edit className="w-4 h-4" />
                   Modifier ma page
                 </Link>
               </div>

@@ -40,7 +40,7 @@ export default function PublicSchoolPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-forest-600 to-forest-500 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-gabon-green to-gabon-green-dark rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-2xl">🏫</span>
               </div>
               <div>

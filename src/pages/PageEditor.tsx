@@ -37,7 +37,7 @@ export default function PageEditor() {
                 <Eye className="w-4 h-4" />
                 Prévisualiser
               </button>
-              <button className="btn-primary flex items-center gap-2 text-sm">
+              <button className="bg-gradient-to-r from-gabon-green to-gabon-green-dark text-white px-6 py-2 rounded-lg font-semibold text-sm hover:shadow-lg transition-all flex items-center gap-2">
                 <Save className="w-4 h-4" />
                 Publier
               </button>
